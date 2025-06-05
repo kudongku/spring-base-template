@@ -39,10 +39,15 @@ public class ApiLogFilter extends OncePerRequestFilter {
 
         filterChain.doFilter(wrappedRequest, wrappedResponse);
 
+
+        if (isSwaggerUri(request.getRequestURI())) {
+            wrappedResponse.copyBodyToResponse();
+            return;
+        }
+
         long duration = System.currentTimeMillis() - start;
         String requestBody = getStringValue(wrappedRequest.getContentAsByteArray());
         String responseBody = getStringValue(wrappedResponse.getContentAsByteArray());
-        String uri = request.getRequestURI();
         int status = wrappedResponse.getStatus();
         String message = null;
         String errorCode = null;
@@ -58,7 +63,7 @@ public class ApiLogFilter extends OncePerRequestFilter {
         }
 
         // Todo. saveLogAsync logic을 dev와 prod 에만 적용
-        if (!isSwaggerUri(uri) && isActiveProfile("local", "dev", "prod")) {
+        if (isActiveProfile("local", "dev", "prod")) {
             apiLogService.saveLogAsync(
                 request.getRequestURI(),
                 request.getMethod(),
@@ -98,7 +103,8 @@ public class ApiLogFilter extends OncePerRequestFilter {
         return uri.startsWith("/swagger")
             || uri.startsWith("/v3/api-docs")
             || uri.startsWith("/swagger-ui")
-            || uri.startsWith("/api-docs");
+            || uri.startsWith("/api-docs")
+            || uri.startsWith("/.well-known/appspecific/com.chrome.devtools.json");
     }
 
 }
