@@ -18,19 +18,25 @@ public class ApiResponse<T> {
     // 성공 응답용 정적 메서드
     public static <T> ApiResponse<T> success(int status, T data) {
         return ApiResponse.<T>builder()
-                .success(true)
-                .status(status)
-                .data(data)
-                .build();
+            .success(true)
+            .status(status)
+            .data(data)
+            .build();
     }
 
     // 실패 응답용 정적 메서드
-    public static <T> ApiResponse<T> fail(int status, String message, String errorCode) {
+    public static <T> ApiResponse<T> fail(
+        int status,
+        T stackTraces,
+        String message,
+        String errorCode
+    ) {
         return ApiResponse.<T>builder()
-                .success(false)
-                .status(status)
-                .message(message)
-                .errorCode(errorCode)
-                .build();
+            .success(false)
+            .status(status)
+            .data(stackTraces)
+            .message(message)
+            .errorCode(errorCode)
+            .build();
     }
 }

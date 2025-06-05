@@ -18,22 +18,22 @@ public class CommonController {
     @Operation(summary = "healthCheck API", description = "200번대 반환")
     public ResponseEntity<ApiResponse<String>> healthCheck() {
         return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(ApiResponse.success(200, "ok"));
+            .status(HttpStatus.OK)
+            .body(ApiResponse.success(200, "ok"));
     }
 
     @GetMapping("/fail")
     @Operation(summary = "failCheck API", description = "400번대 반환")
     public ResponseEntity<ApiResponse<Void>> failCheck() {
         return ResponseEntity
-                .status(HttpStatus.BAD_REQUEST)
-                .body(ApiResponse.fail(400, "fail", "INVALID_REQUEST"));
+            .status(HttpStatus.BAD_REQUEST)
+            .body(ApiResponse.fail(400, null, "fail", "INVALID_REQUEST"));
     }
 
     @GetMapping("/error")
     @Operation(summary = "errorCheck API", description = "500번대 반환")
     public ResponseEntity<ApiResponse<Void>> errorCheck() throws Exception {
-        throw new Exception();
+        throw new Exception("errorCheck API test");
     }
 
 }
