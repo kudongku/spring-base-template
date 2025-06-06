@@ -7,6 +7,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import kr.soulware.teen_mydata.service.ApiLogService;
+import kr.soulware.teen_mydata.service.MailService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.env.Environment;
@@ -24,6 +25,7 @@ import java.util.Arrays;
 public class ApiLogFilter extends OncePerRequestFilter {
 
     private final ApiLogService apiLogService;
+    private final MailService mailService;
     private final Environment env;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -60,6 +62,19 @@ public class ApiLogFilter extends OncePerRequestFilter {
             } catch (Exception e) {
                 log.debug("responseBody JSON 파싱 실패: {}", e.getMessage());
             }
+        }
+
+        if (status >= 500 && status < 600) {
+            String subject = "[마이데이터 조성사업] 500번대 에러 발생 " + Arrays.toString(env.getActiveProfiles()) + ": " + request.getRequestURI();
+            String text = "<h2>🚨 500번대 에러 발생</h2>"
+                + "<p><strong>요청 URI:</strong> " + request.getRequestURI() + "</p>"
+                + "<p><strong>Method:</strong> " + request.getMethod() + "</p>"
+                + "<p><strong>Status:</strong> " + status + "</p>"
+                + "<p><strong>RequestBody:</strong> <pre>" + requestBody + "</pre></p>"
+                + "<p><strong>ResponseBody:</strong> <pre>" + responseBody + "</pre></p>";
+
+            String notificationEmail = env.getProperty("notification.email");
+            mailService.sendErrorMailAsync(subject, text, notificationEmail);
         }
 
         // Todo. saveLogAsync logic을 dev와 prod 에만 적용
