@@ -5,13 +5,15 @@ import kr.soulware.teen_mydata.repository.ApiLogRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-@RequiredArgsConstructor
 @Service
+@RequiredArgsConstructor
 public class ApiLogService {
 
     private final ApiLogRepository apiLogRepository;
 
+    @Transactional
     @Async
     public void saveLogAsync(
         String requestUri,
@@ -36,4 +38,5 @@ public class ApiLogService {
 
         apiLogRepository.save(apiLog);
     }
+
 }

@@ -9,9 +9,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@Tag(name = "테스트 API", description = "테스트 관련 API입니다.")
-@RequestMapping("/api/common")
 @RestController
+@RequestMapping("/api/common")
+@Tag(name = "테스트 API", description = "테스트 관련 API입니다.")
 public class CommonController {
 
     @GetMapping("/health")

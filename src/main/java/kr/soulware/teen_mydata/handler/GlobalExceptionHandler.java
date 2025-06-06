@@ -11,9 +11,9 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
+@RestControllerAdvice
 @Hidden
 @Slf4j(topic = "GlobalExceptionHandler")
-@RestControllerAdvice
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)

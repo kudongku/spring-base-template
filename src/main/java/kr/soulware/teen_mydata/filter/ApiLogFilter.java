@@ -19,9 +19,9 @@ import org.springframework.web.util.ContentCachingResponseWrapper;
 import java.io.IOException;
 import java.util.Arrays;
 
-@Slf4j(topic = "ApiLogFilter")
 @Component
 @RequiredArgsConstructor
+@Slf4j(topic = "ApiLogFilter")
 public class ApiLogFilter extends OncePerRequestFilter {
 
     private final ApiLogService apiLogService;

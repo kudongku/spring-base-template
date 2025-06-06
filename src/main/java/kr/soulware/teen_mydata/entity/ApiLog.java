@@ -6,8 +6,8 @@ import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 
-@NoArgsConstructor
 @Entity
+@NoArgsConstructor
 @Table(name = "api_log")
 public class ApiLog {
 
