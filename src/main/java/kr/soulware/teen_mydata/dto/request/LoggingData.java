@@ -15,5 +15,7 @@ public class LoggingData {
     private String errorCode;
     private String message;
     private int duration;
+    private String requestParams;
+    private String summary;
 
 }

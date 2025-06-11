@@ -24,7 +24,9 @@ public class ApiLogService {
             data.getResponseBody(),
             data.getStatus(),
             data.getMessage(),
-            data.getDuration()
+            data.getDuration(),
+            data.getRequestParams(),
+            data.getSummary()
         );
 
         apiLogRepository.save(apiLog);

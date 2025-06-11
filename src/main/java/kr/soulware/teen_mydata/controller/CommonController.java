@@ -27,6 +27,7 @@ public class CommonController {
     public ResponseEntity<ApiResponse<TestRequestDto>> test(
         @PathVariable String type,
         @RequestParam String message,
+        @RequestParam int status,
         @RequestBody TestRequestDto test
     ) throws Exception {
         return switch (type) {
@@ -34,7 +35,7 @@ public class CommonController {
             case "error" -> throw new Exception(message);
             default -> ResponseEntity
                 .status(HttpStatus.OK)
-                .body(ApiResponse.success(200, test));
+                .body(ApiResponse.success(status, test));
         };
     }
 

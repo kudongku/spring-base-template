@@ -15,6 +15,9 @@ public class ApiLog {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "summary", length = 255)
+    private String summary;
+
     @Column(name = "request_uri", length = 255)
     private String requestUri;
 
@@ -24,17 +27,20 @@ public class ApiLog {
     @Column(name = "request_body", columnDefinition = "TEXT")
     private String requestBody;
 
+    @Column(name = "request_params", columnDefinition = "TEXT")
+    private String requestParams;
+
     @Column(name = "response_body", columnDefinition = "TEXT")
     private String responseBody;
 
     @Column(name = "status_code")
     private Integer statusCode;
 
-    @Column(name = "error_message", columnDefinition = "TEXT")
-    private String errorMessage;
-
     @Column(name = "duration_ms")
     private Integer durationMs;
+
+    @Column(name = "error_message", columnDefinition = "TEXT")
+    private String errorMessage;
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
@@ -47,7 +53,9 @@ public class ApiLog {
         String responseBody,
         Integer statusCode,
         String errorMessage,
-        Integer durationMs
+        Integer durationMs,
+        String requestParams,
+        String summary
     ) {
         this.requestUri = requestUri;
         this.httpMethod = httpMethod;
@@ -56,6 +64,8 @@ public class ApiLog {
         this.statusCode = statusCode;
         this.errorMessage = errorMessage;
         this.durationMs = durationMs;
+        this.requestParams = requestParams;
+        this.summary = summary;
     }
 
 }
