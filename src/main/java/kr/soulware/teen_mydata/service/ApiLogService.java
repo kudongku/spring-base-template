@@ -1,5 +1,6 @@
 package kr.soulware.teen_mydata.service;
 
+import kr.soulware.teen_mydata.dto.request.LoggingData;
 import kr.soulware.teen_mydata.entity.ApiLog;
 import kr.soulware.teen_mydata.repository.ApiLogRepository;
 import lombok.RequiredArgsConstructor;
@@ -15,25 +16,15 @@ public class ApiLogService {
 
     @Transactional
     @Async
-    public void saveLogAsync(
-        String requestUri,
-        String httpMethod,
-        String requestBody,
-        String responseBody,
-        int statusCode,
-        String errorCode,
-        String errorMessage,
-        int durationMs
-    ) {
+    public void saveLogAsync(LoggingData data) {
         ApiLog apiLog = new ApiLog(
-            requestUri,
-            httpMethod,
-            requestBody,
-            responseBody,
-            statusCode,
-            errorCode,
-            errorMessage,
-            durationMs
+            data.getRequestUri(),
+            data.getHttpMethod(),
+            data.getRequestBody(),
+            data.getResponseBody(),
+            data.getStatus(),
+            data.getMessage(),
+            data.getDuration()
         );
 
         apiLogRepository.save(apiLog);

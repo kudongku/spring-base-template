@@ -2,16 +2,20 @@ package kr.soulware.teen_mydata.dto.response;
 
 import lombok.Builder;
 import lombok.Getter;
+import lombok.ToString;
 
 @Getter
 @Builder
+@ToString
 public class ApiResponse<T> {
 
     private boolean success;
     private int status;
+
+    // case of (success = true)
     private T data;
 
-    // exception일 경우
+    // case of (success = false)
     private String message;
     private String errorCode;
 
@@ -27,14 +31,12 @@ public class ApiResponse<T> {
     // 실패 응답용 정적 메서드
     public static <T> ApiResponse<T> fail(
         int status,
-        T stackTraces,
         String message,
         String errorCode
     ) {
         return ApiResponse.<T>builder()
             .success(false)
             .status(status)
-            .data(stackTraces)
             .message(message)
             .errorCode(errorCode)
             .build();

@@ -62,7 +62,7 @@ src/
 │   │       ├── dto/           # 데이터 전송 객체
 │   │       │   ├── request/   # 요청 DTO
 │   │       │   └── response/  # 응답 DTO
-│   │       ├── filter/        # 서블릿 필터
+│   │       ├── AOP/           # AOP
 │   │       └── handler/       # 예외 처리
 │   └── resources/
 │       ├── application-local.properties    # 로컬 환경변수 설정

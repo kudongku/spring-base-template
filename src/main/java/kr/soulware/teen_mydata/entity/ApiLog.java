@@ -30,9 +30,6 @@ public class ApiLog {
     @Column(name = "status_code")
     private Integer statusCode;
 
-    @Column(name = "error_code", length = 100)
-    private String errorCode;
-
     @Column(name = "error_message", columnDefinition = "TEXT")
     private String errorMessage;
 
@@ -49,7 +46,6 @@ public class ApiLog {
         String requestBody,
         String responseBody,
         Integer statusCode,
-        String errorCode,
         String errorMessage,
         Integer durationMs
     ) {
@@ -58,7 +54,6 @@ public class ApiLog {
         this.requestBody = requestBody;
         this.responseBody = responseBody;
         this.statusCode = statusCode;
-        this.errorCode = errorCode;
         this.errorMessage = errorMessage;
         this.durationMs = durationMs;
     }

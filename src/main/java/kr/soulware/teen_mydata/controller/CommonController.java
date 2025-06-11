@@ -2,12 +2,12 @@ package kr.soulware.teen_mydata.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import kr.soulware.teen_mydata.dto.request.TestRequestDto;
 import kr.soulware.teen_mydata.dto.response.ApiResponse;
+import kr.soulware.teen_mydata.exception.CustomNullPointerException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/common")
@@ -22,18 +22,20 @@ public class CommonController {
             .body(ApiResponse.success(200, "ok"));
     }
 
-    @GetMapping("/fail")
-    @Operation(summary = "failCheck API", description = "400번대 반환")
-    public ResponseEntity<ApiResponse<Void>> failCheck() {
-        return ResponseEntity
-            .status(HttpStatus.BAD_REQUEST)
-            .body(ApiResponse.fail(400, null, "fail", "INVALID_REQUEST"));
-    }
-
-    @GetMapping("/error")
-    @Operation(summary = "errorCheck API", description = "500번대 반환")
-    public ResponseEntity<ApiResponse<Void>> errorCheck() throws Exception {
-        throw new Exception("errorCheck API test");
+    @PostMapping("/test/{type}")
+    @Operation(summary = "test API", description = "type = fail or error or success")
+    public ResponseEntity<ApiResponse<TestRequestDto>> test(
+        @PathVariable String type,
+        @RequestParam String message,
+        @RequestBody TestRequestDto test
+    ) throws Exception {
+        return switch (type) {
+            case "fail" -> throw new CustomNullPointerException(message);
+            case "error" -> throw new Exception(message);
+            default -> ResponseEntity
+                .status(HttpStatus.OK)
+                .body(ApiResponse.success(200, test));
+        };
     }
 
 }
