@@ -19,9 +19,13 @@ spring.mail.properties.mail.smtp.starttls.enable=true
 
 # Notification Configuration
 notification.email=admin_account@soulware.kr
+info.profile=local or dev or prod
 
 # Actuator & Prometheus
 management.endpoints.web.exposure.include=health,info,prometheus
 management.endpoint.prometheus.enabled=true
+management.endpoint.info.os.enabled=true
+management.info.env.enabled=true
+management.info.git.enabled=true
 management.metrics.export.prometheus.enabled=true
 management.endpoints.web.base-path=/actuator

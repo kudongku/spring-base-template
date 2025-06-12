@@ -1,17 +1,4 @@
 services:
-  springboot:
-    build: .
-    container_name: springboot-app
-    ports:
-      - "8080:8080"
-    environment:
-      - SPRING_PROFILES_ACTIVE=local
-      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/teen
-      - SPRING_DATASOURCE_USERNAME=root
-      - SPRING_DATASOURCE_PASSWORD=1234
-    depends_on:
-      mysql:
-        condition: service_healthy
   mysql:
     image: mysql:8.0
     container_name: mysql
@@ -23,10 +10,24 @@ services:
     volumes:
       - mysql_data:/var/lib/mysql
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-p1234"]
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "-p1234" ]
       interval: 5s
       timeout: 5s
       retries: 10
+
+  springboot:
+    build: .
+    container_name: springboot-app
+    ports:
+      - "8084:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=dev
+    depends_on:
+      mysql:
+        condition: service_healthy
+    volumes:
+      - ./logs:/var/log/app
+
   prometheus:
     image: prom/prometheus:latest
     container_name: prometheus
@@ -34,6 +35,31 @@ services:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml
     ports:
       - "9090:9090"
+
+  loki:
+    image: grafana/loki:3.5.1
+    container_name: loki
+    ports:
+      - "3100:3100"
+    command: -config.file=/etc/loki/local-config.yaml
+    volumes:
+      - ./loki-config.yaml:/etc/loki/local-config.yaml
+      - ./loki:/loki
+      - ./wal:/wal
+      - ./compactor:/compactor
+    environment:
+      - LOKI_COMPACTOR_DIR=/compactor
+
+  promtail:
+    image: grafana/promtail:2.9.4
+    container_name: promtail
+    volumes:
+      - ./promtail-config.yaml:/etc/promtail/promtail.yaml
+      - ./logs:/var/log/app
+    command: -config.file=/etc/promtail/promtail.yaml
+    depends_on:
+      - loki
+
   grafana:
     image: grafana/grafana:latest
     container_name: grafana
@@ -41,5 +67,6 @@ services:
       - "3003:3000"
     depends_on:
       - prometheus
+
 volumes:
   mysql_data:
