@@ -7,6 +7,8 @@ import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.EnumType;
 
 @Entity
 @Getter
@@ -31,12 +33,21 @@ public class User extends Timestamp {
     @Column(nullable = true)
     private String profileImage; // 프로필 이미지 URL
 
-    public User(String email, String name, String provider, String providerId, String profileImage) {
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Role role = Role.USER; // 기본값 USER
+
+    public User(String email, String name, String provider, String providerId, String profileImage, Role role) {
         this.email = email;
         this.name = name;
         this.provider = provider;
         this.providerId = providerId;
         this.profileImage = profileImage;
+        this.role = role;
+    }
+
+    public User(String email, String name, String provider, String providerId, String profileImage) {
+        this(email, name, provider, providerId, profileImage, Role.USER);
     }
 
 }
