@@ -2,12 +2,14 @@ package kr.soulware.teen_mydata.entity;
 
 import jakarta.persistence.*;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.CreationTimestamp;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 
 @Entity
 @NoArgsConstructor
+@EntityListeners(AuditingEntityListener.class)
 @Table(name = "api_log")
 public class ApiLog {
 
@@ -42,7 +44,7 @@ public class ApiLog {
     @Column(name = "error_message", columnDefinition = "TEXT")
     private String errorMessage;
 
-    @CreationTimestamp
+    @CreatedDate
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 

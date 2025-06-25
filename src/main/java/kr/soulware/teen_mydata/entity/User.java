@@ -13,7 +13,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @Table(name = "users")
-public class User {
+public class User extends Timestamp {
 
     @Id
     @Column(nullable = false)
@@ -37,10 +37,6 @@ public class User {
         this.provider = provider;
         this.providerId = providerId;
         this.profileImage = profileImage;
-    }
-
-    public User(String email, String name, String provider, String providerId) {
-        this(email, name, provider, providerId, null);
     }
 
 }
