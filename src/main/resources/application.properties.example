@@ -6,8 +6,6 @@ spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
 
 # JPA Configuration
 spring.jpa.hibernate.ddl-auto=validate
-spring.jpa.show-sql=true
-spring.jpa.properties.hibernate.format_sql=true
 
 # Mail Configuration
 spring.mail.host=smtp.gmail.com
@@ -30,13 +28,12 @@ management.metrics.export.prometheus.enabled=true
 management.endpoints.web.base-path=/actuator
 
 # OAuth2 Google Login Example
-# 아래 값은 구글 클라우드 콘솔에서 발급받은 실제 client-id, client-secret, redirect-uri로 교체하세요.
 spring.security.oauth2.client.registration.google.client-id=your-google-client-id
 spring.security.oauth2.client.registration.google.client-secret=your-google-client-secret
 spring.security.oauth2.client.registration.google.redirect-uri={baseUrl}/login/oauth2/code/google
 spring.security.oauth2.client.registration.google.scope=profile,email
 
-# Swagger UI 및 OpenAPI 설정 예시
+# Swagger UI
 springdoc.api-docs.path=/v3/api-docs
 springdoc.swagger-ui.path=/swagger-ui.html
 springdoc.swagger-ui.oauth.client-id=your-google-client-id

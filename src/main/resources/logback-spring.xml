@@ -2,13 +2,10 @@
     <!-- 1. 파일 로그 (롤링) -->
     <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>logs/spring.log</file>
-        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
             <fileNamePattern>logs/spring.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <maxFileSize>10MB</maxFileSize>
             <maxHistory>30</maxHistory>
-            <totalSizeCap>3GB</totalSizeCap> <!-- 30개 파일 * 100MB 예시, 필요시 조정 -->
-            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
-                <maxFileSize>100MB</maxFileSize>
-            </timeBasedFileNamingAndTriggeringPolicy>
         </rollingPolicy>
         <encoder>
             <!-- 스프링부트 기본 패턴 -->
@@ -27,6 +24,7 @@
     <springProfile name="local">
         <root level="INFO">
             <appender-ref ref="CONSOLE"/>
+            <appender-ref ref="FILE"/>
         </root>
     </springProfile>
     <springProfile name="dev">
