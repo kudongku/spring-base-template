@@ -19,7 +19,6 @@ spring.mail.properties.mail.smtp.starttls.enable=true
 
 # Notification Configuration
 notification.email=admin_account@soulware.kr
-info.profile=local or dev or prod
 
 # Actuator & Prometheus
 management.endpoints.web.exposure.include=health,info,prometheus
@@ -36,3 +35,12 @@ spring.security.oauth2.client.registration.google.client-id=your-google-client-i
 spring.security.oauth2.client.registration.google.client-secret=your-google-client-secret
 spring.security.oauth2.client.registration.google.redirect-uri={baseUrl}/login/oauth2/code/google
 spring.security.oauth2.client.registration.google.scope=profile,email
+
+# Swagger UI 및 OpenAPI 설정 예시
+springdoc.api-docs.path=/v3/api-docs
+springdoc.swagger-ui.path=/swagger-ui.html
+springdoc.swagger-ui.oauth.client-id=your-google-client-id
+springdoc.swagger-ui.oauth.client-secret=your-google-client-secret
+springdoc.swagger-ui.oauth.scopes=profile,email
+springdoc.swagger-ui.oauth.use-pkce-with-authorization-code-grant=true
+springdoc.oauth2.redirect-uri={baseUrl}/swagger-ui/oauth2-redirect.html
