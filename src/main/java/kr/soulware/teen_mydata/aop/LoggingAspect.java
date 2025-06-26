@@ -3,10 +3,11 @@ package kr.soulware.teen_mydata.aop;
 import jakarta.servlet.http.HttpServletRequest;
 import kr.soulware.teen_mydata.dto.request.LoggingData;
 import kr.soulware.teen_mydata.dto.response.ApiResponse;
+import kr.soulware.teen_mydata.enums.ProfileType;
 import kr.soulware.teen_mydata.exception.BusinessException;
 import kr.soulware.teen_mydata.service.ApiLogService;
 import kr.soulware.teen_mydata.service.MailService;
-import kr.soulware.teen_mydata.util.ProfileUtil;
+import kr.soulware.teen_mydata.service.ProfileCheckService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -30,7 +31,7 @@ public class LoggingAspect {
 
     private final ApiLogService apiLogService;
     private final MailService mailService;
-    private final ProfileUtil profileUtil;
+    private final ProfileCheckService profileCheckService;
 
     @Around("execution(* kr.soulware.teen_mydata.controller.*.*(..))")
     public Object logApi(ProceedingJoinPoint joinPoint) throws Throwable {
@@ -158,11 +159,11 @@ public class LoggingAspect {
             data.getResponseBody()
         );
 
-        if (profileUtil.isActiveProfile(ProfileUtil.LOCAL, ProfileUtil.DEV, ProfileUtil.PROD)) {
+        if (profileCheckService.isActiveProfile(ProfileType.LOCAL, ProfileType.DEV, ProfileType.PROD)) {
             apiLogService.saveLogAsync(data);
         }
 
-        if (profileUtil.isActiveProfile(ProfileUtil.DEV, ProfileUtil.PROD)
+        if (profileCheckService.isActiveProfile(ProfileType.DEV, ProfileType.PROD)
             && data.getStatus() >= 500 && data.getStatus() < 600
         ) {
             mailService.sendErrorMailAsync(data);
