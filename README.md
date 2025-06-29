@@ -100,6 +100,26 @@ src/main/java/kr/soulware/teen_mydata/
 
 ---
 
+## git workflow
+
+### 1) github 이슈 생성
+
+- 이슈에 맞는 브랜치 생성
+- 브랜치 이름, ex) [issue number]-[issue title]
+- 커밋메세지, ex) [type]: [summary]
+
+### 2) feature → develop
+
+- Rebase and Merge 방식
+- 커밋메세지, ex) [type]/[branch_name]:[issue title]
+
+### 3) develop → main
+
+- Squash and Merge 방식 
+- 커밋메세지, ex) v[version]: [release summary]
+
+---
+
 ## 컨벤션
 
 ### 공통 응답 포맷
