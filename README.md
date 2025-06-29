@@ -1,125 +1,108 @@
-# 마이데이터 조성사업
+# Teen MyData 백엔드
+
+## 프로젝트 개요
+
+- **목적**: 마이데이터 조성사업의 기술스택으로 Spring Boot를 채택하였으며, 스프링부트의 로깅 시스템과 모니터링 시스템 등 비즈니스 로직이 아닌 서비스 로직에 집중하여 프로젝트를 설계·구현하고 있습니다.
+- **구현 기능**:
+  - 구글 등 OAuth2 로그인 → JWT 발급 → 권한별 API 접근 제어
+  - 일관된 API 응답 DTO (`ApiResponse`)
+  - AOP 사용한 API 호출/응답/에러 로깅 (DB+메일)
+  - P6Spy 사용한 쿼리 파라미터 로깅
+  - Swagger(OpenAPI) 문서 자동화 + 인증기능 구현
+  - **Spring Boot Actuator, Prometheus, Grafana**를 활용한 리소스/헬스 모니터링
+  - **Loki + Grafana + Promtail** 기반의 로그 수집 및 대시보드 구축
 
 ---
 
-## 기술 스택
+## 🚀 기술 스택
 
-- Java 21
-- Spring Boot 3.5.0
-- Spring Data JPA
-- MySQL
-- Lombok
-- SpringDoc OpenAPI (Swagger)
-- Spring Mail
+| 구분        | 사용 기술 및 도구                                                                            | 비고/설명                                 |
+| ----------- | -------------------------------------------------------------------------------------------- | ----------------------------------------- |
+| Language    | ![Java](https://img.shields.io/badge/Java-21-blue?logo=java)                                 | 가장 최신 LTS 버전 유지                   |
+| Framework   | ![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.5.0-brightgreen?logo=springboot) | java version과 호환되는 LTS               |
+| ORM         | Spring Data JPA                                                                              | DB 연동, 트랜잭션 관리, QueryDsl 도입예정 |
+| Database    | ![MySQL](https://img.shields.io/badge/MySQL-8.0-blue?logo=mysql)                             | 관계형 데이터베이스                       |
+| Build Tool  | ![Gradle](https://img.shields.io/badge/Gradle-7.x-02303A?logo=gradle)                        | 빌드/의존성 관리                          |
+| Security    | Spring Security (OAuth2, JWT)                                                                | 소셜 로그인, JWT 인증/인가                |
+| Docs        | SpringDoc OpenAPI (Swagger)                                                                  | API 문서 자동화                           |
+| Mail        | Spring Mail                                                                                  | 에러/알림 메일 발송                       |
+| Logging/AOP | AOP, SLF4J, P6Spy                                                                            | API 호출/응답/에러 로깅                   |
+| Monitoring  | Spring Boot Actuator, Prometheus, Grafana                                                    | 리소스/헬스 모니터링, 대시보드            |
+| Log Collect | Loki, Promtail, Grafana                                                                      | 로그 수집, 중앙집중 대시보드              |
+| Container   | ![Docker](https://img.shields.io/badge/Docker-%230db7ed.svg?logo=docker&logoColor=white)     | 개발/운영 환경 컨테이너 지원              |
+| Test        | JUnit                                                                                        | 단위/통합 테스트 작성예정                 |
+| CI/CD       | ![Jenkins](https://img.shields.io/badge/Jenkins-%232C3A42.svg?logo=jenkins&logoColor=white)  | 테스트, 빌드, 배포 자동화                 |
+| 기타        | Lombok                                                                                       | 코드 간결화(어노테이션 기반)              |
 
-## 프로젝트 실행 방법
+---
 
-1. 프로젝트 클론
+## 📝 TODO
 
-```bash
-git clone [repository-url]
+- [ ] Jenkins 기반 CI/CD 파이프라인 구현 (테스트, 빌드, 배포 자동화)
+- [ ] Log 수집/저장 모델 개선 (API 로그 구조 및 저장 방식 고도화)
+- [ ] Querydsl 도입 (복잡한 동적 쿼리 및 타입 안전성 확보)
+- [ ] 데이터베이스를 MySQL → PostgreSQL로 이전 (이식성 및 확장성 강화)
+- [ ] 브랜치 전략 (squash and merge?)
+- [ ] 서비스 로직과 비즈니스 로직 분리
+---
+
+## 폴더/아키텍처 구조
+
+```
+src/main/java/kr/soulware/teen_mydata/
+├── aop/           # AOP(로깅 등)
+├── config/        # 보안, Swagger 등 설정
+├── controller/    # API 엔드포인트
+├── dto/           # 요청/응답 DTO
+├── entity/        # JPA 엔티티
+├── enums/         # Enum(권한 등)
+├── exception/     # 커스텀 예외
+├── filter/        # JWT 인증 필터
+├── handler/       # 예외/인증 핸들러
+├── repository/    # JPA Repository
+├── service/       
+└── TeenMydataApplication.java
 ```
 
-2. 의존성 설치
+---
+
+## 설치 및 실행
+
+### 1) 환경 변수
+
+- `src/main/resources/application-local.properties` 생성  
+  (예시는 `application.properties.example` 참고)
+- 필수 환경 변수 예시:
+  - DB 접속 정보
+  - OAuth2 Client ID/Secret
+  - JWT Secret Key
+  - 메일 서버 정보 등
+
+### 2) 의존성 설치 및 빌드
 
 ```bash
 ./gradlew build
 ```
 
-3. VM 옵션 설정
-
-```
--Dspring.profiles.active={profile}
-```
-
-4. application-local.properties 생성
-
-```application.properties.example```을 참고해서 생성
-
-5. 애플리케이션 실행
+### 3) 서버 실행
 
 ```bash
 ./gradlew bootRun
 ```
 
-## API 문서
+### 4) Swagger API 문서
 
-Swagger UI를 통해 API 문서를 확인할 수 있습니다.
+- http://localhost:8080/swagger-ui.html
 
-- URL: ```http://[your_ip or localhost]:8080/swagger-ui.html```
+### 5) oauth 로그인
 
-## 프로젝트 구조
+- http://localhost:8080/oauth2/authorization/google
 
-```
-src/
-├── main/
-│   ├── java/
-│   │   └── kr/soulware/teen_mydata/
-│   │       ├── controller/    # API 엔드포인트 정의
-│   │       ├── service/       # 비즈니스 로직
-│   │       ├── repository/    # 데이터 접근 계층
-│   │       ├── entity/        # JPA 엔티티
-│   │       ├── dto/           # 데이터 전송 객체
-│   │       │   ├── request/   # 요청 DTO
-│   │       │   └── response/  # 응답 DTO
-│   │       ├── AOP/           # AOP
-│   │       └── handler/       # 예외 처리
-│   └── resources/
-│       ├── application-local.properties    # 로컬 환경변수 설정
-│       ├── application-dev.properties      # 개발 환경변수 설정
-│       ├── application-prod.properties     # 운영 환경변수 설정
-│       └── application.properties.example  # 환경변수 가이드
-└── test/
-```
+---
 
 ## 컨벤션
 
-### 1. 네이밍 컨벤션
-
-- 클래스명: PascalCase
-- 메서드명: camelCase
-- 변수명: camelCase
-- 상수: UPPER_SNAKE_CASE
-- 패키지명: 소문자
-
-### 2. 어노테이션 컨벤션
-
-1. Spring stereotype
-   (@RestController, @Service, @Repository, @Component 등)
-2. Request/Mapping, hidden
-   (@RequestMapping, @GetMapping, @Hidden)
-3. Swagger/OpenAPI
-   (@Tag, @Operation 등)
-4. Lombok
-   (@Getter, @Setter → @Builder → @NoArgsConstructor, @RequiredArgsConstructor, @AllArgsConstructor → @ToString,
-   @EqualsAndHashCode -> @Slf4j)
-5. Spring AOP/트랜잭션, table
-   (@Transactional, @table)
-6. 비동기/스케줄링
-   (@Async, @Scheduled 등)
-   클래스/메서드 선언
-
-### 3. API 문서화, 응답형식
-
-- 모든 API 응답은 `ApiResponse` 클래스를 사용하여 일관된 형식으로 반환합니다:
-- controller 상단에 tag, method 상단에 operation을 작성한다.
-
-```java
-
-@Tag(name = "API 그룹명", description = "API 그룹 설명")
-// ...
-public class ControllerName {
-
-    @Operation(summary = "API 요약", description = "API 상세 설명")
-    // ...
-    public ResponseEntity<ApiResponse<T>> methodName() {
-        // ...
-    }
-
-}
-```
-
-#### case of success
+### 공통 응답 포맷
 
 ```json
 {
@@ -130,43 +113,3 @@ public class ControllerName {
   "errorCode": null
 }
 ```
-
-#### case of fail
-
-```json
-{
-  "success": false,
-  "status": 400,
-  "data": {},
-  "message": "fail",
-  "errorCode": "FAIL"
-}
-```
-
-### 4. 로깅 규칙
-
-- 로그 레벨 사용 기준:
-    - ERROR: 예외 발생 시
-    - WARN: 잠재적 문제 발생 시
-    - INFO: 중요 비즈니스 로직 실행 시
-    - DEBUG: 상세 디버깅 정보
-- 로그 포맷: `[로그 주제] 메시지 | 파라미터1: 값1 | 파라미터2: 값2`
-
-### 5. 비동기 처리
-
-- `@Async` 어노테이션을 사용한 비동기 메서드는 명확한 네이밍 규칙을 따릅니다:
-    - 메서드명 끝에 'Async' 접미사 사용
-    - 예: `saveLogAsync()`, `sendErrorMailAsync()`
-
-### 6. 예외 처리
-
-- 모든 예외는 `GlobalExceptionHandler`에서 처리
-- 커스텀 예외는 적절한 HTTP 상태 코드와 함께 처리
-- 예외 발생 시 로그는 반드시 남기도록 구현
-
-## 기여 방법
-
-1. 이슈 생성
-2. 브랜치 생성
-3. 변경사항 커밋
-4. Pull Request 생성
