@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <title>웹소켓 채팅 테스트</title>
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 30px;
+      }
+      #chat {
+        margin-top: 20px;
+        border: 1px solid #ccc;
+        padding: 10px;
+        height: 200px;
+        overflow-y: scroll;
+        background: #fafafa;
+      }
+      #chat li {
+        margin-bottom: 5px;
+      }
+      #username,
+      #message {
+        padding: 5px;
+      }
+      button {
+        padding: 5px 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <h2>웹소켓 채팅 테스트</h2>
+    <input id="username" placeholder="닉네임 입력" />
+    <button onclick="connect()">연결</button>
+    <br /><br />
+    <input id="message" placeholder="메시지 입력" />
+    <button onclick="sendMessage()">전송</button>
+    <ul id="chat"></ul>
+    <script>
+      let stompClient = null;
+
+      function connect() {
+        const username = document.getElementById("username").value;
+        if (!username) {
+          alert("닉네임을 입력하세요.");
+          return;
+        }
+        const socket = new SockJS("/ws");
+        stompClient = Stomp.over(socket);
+        stompClient.connect({}, function () {
+          stompClient.subscribe("/topic/public", function (msg) {
+            const message = JSON.parse(msg.body);
+            const li = document.createElement("li");
+            li.textContent = `[${message.type}] ${message.sender}: ${message.content}`;
+            document.getElementById("chat").appendChild(li);
+          });
+          // 사용자 입장 알림
+          stompClient.send(
+            "/app/chat.addUser",
+            {},
+            JSON.stringify({
+              sender: username,
+              type: "JOIN",
+            })
+          );
+        });
+      }
+
+      function sendMessage() {
+        const content = document.getElementById("message").value;
+        const sender = document.getElementById("username").value;
+        if (!stompClient || !stompClient.connected) {
+          alert("먼저 연결하세요.");
+          return;
+        }
+        if (!content) {
+          alert("메시지를 입력하세요.");
+          return;
+        }
+        stompClient.send(
+          "/app/chat.sendMessage",
+          {},
+          JSON.stringify({
+            sender: sender,
+            content: content,
+            type: "CHAT",
+          })
+        );
+        document.getElementById("message").value = "";
+      }
+    </script>
+  </body>
+</html>
