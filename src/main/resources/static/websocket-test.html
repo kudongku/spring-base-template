@@ -2,7 +2,7 @@
 <html lang="ko">
   <head>
     <meta charset="UTF-8" />
-    <title>웹소켓 채팅 테스트</title>
+    <title>1:1 채팅방/AI 챗봇</title>
     <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
     <style>
@@ -21,23 +21,25 @@
       #chat li {
         margin-bottom: 5px;
       }
-      #username,
-      #message,
-      #jwt {
+      #jwt,
+      #roomId,
+      #message {
         padding: 5px;
       }
       button {
         padding: 5px 10px;
       }
-      #jwt {
+      #jwt,
+      #roomId {
         width: 400px;
         margin-bottom: 10px;
       }
     </style>
   </head>
   <body>
-    <h2>웹소켓 채팅 테스트</h2>
+    <h2>1:1 채팅방/AI 챗봇</h2>
     <input id="jwt" placeholder="JWT 토큰 입력" />
+    <input id="roomId" placeholder="채팅방 ID (예: userA_userB, gpt_userA)" />
     <br />
     <button onclick="connect()">연결</button>
     <br /><br />
@@ -46,29 +48,35 @@
     <ul id="chat"></ul>
     <script>
       let stompClient = null;
+      let roomId = null;
 
       function connect() {
         const jwt = document.getElementById("jwt").value;
+        roomId = document.getElementById("roomId").value;
         if (!jwt) {
           alert("JWT 토큰을 입력하세요.");
           return;
         }
-        // JWT를 쿼리 파라미터로 전달
+        if (!roomId) {
+          alert("채팅방 ID를 입력하세요.");
+          return;
+        }
         const socket = new SockJS("/ws?token=" + encodeURIComponent(jwt));
         stompClient = Stomp.over(socket);
         stompClient.connect({}, function () {
-          stompClient.subscribe("/topic/public", function (msg) {
+          stompClient.subscribe("/topic/room." + roomId, function (msg) {
             const message = JSON.parse(msg.body);
             const li = document.createElement("li");
             li.textContent = `[${message.type}] ${message.sender}: ${message.content}`;
             document.getElementById("chat").appendChild(li);
           });
-          // 사용자 입장 알림
+          // 입장 알림
           stompClient.send(
-            "/app/chat.addUser",
+            "/app/chat.addUser." + roomId,
             {},
             JSON.stringify({
               type: "JOIN",
+              roomId: roomId,
             })
           );
         });
@@ -85,11 +93,12 @@
           return;
         }
         stompClient.send(
-          "/app/chat.sendMessage",
+          "/app/chat.sendMessage." + roomId,
           {},
           JSON.stringify({
             content: content,
             type: "CHAT",
+            roomId: roomId,
           })
         );
         document.getElementById("message").value = "";
