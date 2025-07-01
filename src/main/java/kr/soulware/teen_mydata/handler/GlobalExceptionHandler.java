@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 @RestControllerAdvice
 @RequiredArgsConstructor
@@ -27,6 +28,12 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiResponse<?>> handleAuthorizationDeniedException(AuthorizationDeniedException e) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
             .body(ApiResponse.fail(403, e.getMessage(), "ACCESS_DENIED"));
+    }
+
+    @ExceptionHandler(NoResourceFoundException.class)
+    public ResponseEntity<ApiResponse<?>> handleNoResourceFoundException(NoResourceFoundException e) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+            .body(ApiResponse.fail(404, e.getMessage(), "CUSTOM_NULL_POINTER"));
     }
 
     @ExceptionHandler(Exception.class)
