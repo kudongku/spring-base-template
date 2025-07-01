@@ -14,7 +14,7 @@ import java.util.function.Consumer;
 
 @Service
 @RequiredArgsConstructor
-public class ChatGptService {
+public class ChatGptService implements AiChatService {
 
     @Value("${openai.api.key}")
     private String apiKey;
@@ -24,7 +24,8 @@ public class ChatGptService {
 
     private static final ObjectMapper mapper = new ObjectMapper();
 
-    public void streamGptAnswer(String userMessage, Consumer<String> onChunk) {
+    @Override
+    public void streamAiAnswer(String userMessage, Consumer<String> onChunk) {
         OkHttpClient client = new OkHttpClient();
 
         try {
@@ -91,4 +92,5 @@ public class ChatGptService {
             onChunk.accept("[AI 요청 생성 오류: " + e.getMessage() + "]");
         }
     }
+
 }
