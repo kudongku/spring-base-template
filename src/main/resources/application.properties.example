@@ -41,3 +41,6 @@ springdoc.swagger-ui.oauth.client-secret=your-google-client-secret
 springdoc.swagger-ui.oauth.scopes=profile,email
 springdoc.swagger-ui.oauth.use-pkce-with-authorization-code-grant=true
 springdoc.oauth2.redirect-uri={baseUrl}/swagger-ui/oauth2-redirect.html
+
+openai.api.key=sk-xxxxxxx
+openai.api.url=https://api.openai.com/v1/chat/completions
