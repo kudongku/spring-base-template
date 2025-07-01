@@ -1,7 +1,7 @@
 package kr.soulware.teen_mydata.controller;
 
 import kr.soulware.teen_mydata.dto.request.ChatMessage;
-import kr.soulware.teen_mydata.service.ChatGptService;
+import kr.soulware.teen_mydata.service.AiChatService;
 import kr.soulware.teen_mydata.service.ChatMessageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
@@ -18,7 +18,7 @@ import java.util.Objects;
 @Controller
 public class WebSocketController {
 
-    private final ChatGptService chatGptService;
+    private final AiChatService aiChatService;
     private final SimpMessagingTemplate messagingTemplate;
     private final ChatMessageService chatMessageService;
 
@@ -39,7 +39,7 @@ public class WebSocketController {
             // 1. 사용자의 메시지 먼저 전송
             messagingTemplate.convertAndSend("/topic/room." + roomId, chatMessage);
             // 2. AI 답변을 스트리밍으로 chunk별 전송
-            chatGptService.streamGptAnswer(chatMessage.getContent(), chunk -> {
+            aiChatService.streamAiAnswer(chatMessage.getContent(), chunk -> {
                 ChatMessage aiChunk = new ChatMessage();
                 aiChunk.setType(ChatMessage.MessageType.CHAT);
                 aiChunk.setSender("AI");
