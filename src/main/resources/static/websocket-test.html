@@ -37,7 +37,7 @@
     </style>
   </head>
   <body>
-    <h2>1:1 채팅방/AI 챗봇</h2>
+    <h2>1:1 채팅방/AI 챗봇2</h2>
     <input id="jwt" placeholder="JWT 토큰 입력" />
     <input id="roomId" placeholder="채팅방 ID (예: userA_userB, gpt_userA)" />
     <br />
@@ -49,6 +49,11 @@
     <script>
       let stompClient = null;
       let roomId = null;
+      // AI 답변 버퍼 및 타이머
+      let aiBuffer = "";
+      let aiStreaming = false;
+      let aiTimeout = null;
+      const AI_STREAM_END_DELAY = 1200; // ms, AI 답변이 멈췄다고 판단하는 시간
 
       function connect() {
         const jwt = document.getElementById("jwt").value;
@@ -66,9 +71,51 @@
         stompClient.connect({}, function () {
           stompClient.subscribe("/topic/room." + roomId, function (msg) {
             const message = JSON.parse(msg.body);
+            let chatList = document.getElementById("chat");
+
+            // AI 답변 스트리밍 처리
+            if (
+              message.type === "CHAT" &&
+              message.sender === "AI" &&
+              message.content.startsWith("[CHAT] AI:")
+            ) {
+              const content = message.content.replace("[CHAT] AI:", "").trim();
+              aiBuffer += content + " ";
+              aiStreaming = true;
+
+              // AI 스트리밍용 li 찾기 (마지막 li가 아니더라도)
+              let aiLi = Array.from(chatList.children).find(
+                (li) => li.dataset && li.dataset.aiStreaming === "true"
+              );
+              if (aiLi) {
+                aiLi.textContent = `[CHAT] AI: ${aiBuffer}`;
+              } else {
+                const li = document.createElement("li");
+                li.textContent = `[CHAT] AI: ${aiBuffer}`;
+                li.dataset.aiStreaming = "true";
+                chatList.appendChild(li);
+              }
+
+              // AI 답변이 끝났다고 판단되면 버퍼 초기화
+              if (aiTimeout) clearTimeout(aiTimeout);
+              aiTimeout = setTimeout(() => {
+                aiBuffer = "";
+                aiStreaming = false;
+                // 스트리밍 표시 해제
+                let aiLi = Array.from(chatList.children).find(
+                  (li) => li.dataset && li.dataset.aiStreaming === "true"
+                );
+                if (aiLi) {
+                  aiLi.dataset.aiStreaming = "false";
+                }
+              }, AI_STREAM_END_DELAY);
+              return;
+            }
+
+            // 일반 메시지(유저/AI 완성 메시지 등)는 기존 방식대로 출력
             const li = document.createElement("li");
             li.textContent = `[${message.type}] ${message.sender}: ${message.content}`;
-            document.getElementById("chat").appendChild(li);
+            chatList.appendChild(li);
           });
           // 입장 알림
           stompClient.send(

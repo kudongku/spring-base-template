@@ -2,14 +2,18 @@ package kr.soulware.teen_mydata.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import lombok.RequiredArgsConstructor;
+import okhttp3.*;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.*;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 
-import java.util.*;
+import java.io.IOException;
+import java.util.function.Consumer;
 
 @Service
+@RequiredArgsConstructor
 public class ChatGptService {
 
     @Value("${openai.api.key}")
@@ -18,30 +22,73 @@ public class ChatGptService {
     @Value("${openai.api.url}")
     private String API_URL;
 
-    public String askChatGpt(String userMessage) {
-        RestTemplate restTemplate = new RestTemplate();
-        ObjectMapper mapper = new ObjectMapper();
+    private static final ObjectMapper mapper = new ObjectMapper();
 
-        Map<String, Object> requestBody = new HashMap<>();
-        requestBody.put("model", "gpt-4o-mini");
-        requestBody.put("store", true);
-        List<Map<String, String>> messages = new ArrayList<>();
-        messages.add(Map.of("role", "user", "content", userMessage));
-        requestBody.put("messages", messages);
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.setBearerAuth(apiKey);
-
-        HttpEntity<Map<String, Object>> entity = new HttpEntity<>(requestBody, headers);
-
-        ResponseEntity<String> response = restTemplate.postForEntity(API_URL, entity, String.class);
+    public void streamGptAnswer(String userMessage, Consumer<String> onChunk) {
+        OkHttpClient client = new OkHttpClient();
 
         try {
-            JsonNode root = mapper.readTree(response.getBody());
-            return root.path("choices").get(0).path("message").path("content").asText();
+            ObjectNode body = mapper.createObjectNode();
+            body.put("model", "gpt-4o-mini");
+            body.put("stream", true);
+            ArrayNode messages = mapper.createArrayNode();
+            ObjectNode userMsg = mapper.createObjectNode();
+            userMsg.put("role", "user");
+            userMsg.put("content", userMessage);
+            messages.add(userMsg);
+            body.set("messages", messages);
+            String requestBody = mapper.writeValueAsString(body);
+
+            Request request = new Request.Builder()
+                .url(API_URL)
+                .addHeader("Authorization", "Bearer " + apiKey)
+                .addHeader("Content-Type", "application/json")
+                .post(RequestBody.create(requestBody, okhttp3.MediaType.parse("application/json")))
+                .build();
+
+            client.newCall(request).enqueue(new Callback() {
+                @Override
+                public void onFailure(Call call, IOException e) {
+                    onChunk.accept("[AI 응답 오류: " + e.getMessage() + "]");
+                }
+
+                @Override
+                public void onResponse(Call call, Response response) throws IOException {
+                    if (!response.isSuccessful() || response.body() == null) {
+                        onChunk.accept("[AI 응답 오류: " + response.message() + "]");
+                        return;
+                    }
+
+                    try (var reader = response.body().charStream()) {
+                        int c;
+                        StringBuilder line = new StringBuilder();
+
+                        while ((c = reader.read()) != -1) {
+                            if (c == '\n') {
+                                String l = line.toString().trim();
+
+                                if (l.startsWith("data: ")) {
+                                    String json = l.substring(6).trim();
+
+                                    if ("[DONE]".equals(json)) break;
+
+                                    JsonNode node = mapper.readTree(json);
+                                    String chunk = node.path("choices").get(0).path("delta").path("content").asText("");
+
+                                    if (!chunk.isEmpty()) {
+                                        onChunk.accept(chunk);
+                                    }
+                                }
+                                line.setLength(0);
+                            } else {
+                                line.append((char) c);
+                            }
+                        }
+                    }
+                }
+            });
         } catch (Exception e) {
-            return "AI 응답 파싱 오류: " + e.getMessage();
+            onChunk.accept("[AI 요청 생성 오류: " + e.getMessage() + "]");
         }
     }
 }
