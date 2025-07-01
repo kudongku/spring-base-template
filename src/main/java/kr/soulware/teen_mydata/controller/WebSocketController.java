@@ -19,23 +19,27 @@ public class WebSocketController {
 
     @MessageMapping("/chat.sendMessage")
     @SendTo("/topic/public")
-    public ChatMessage sendMessage(@Payload ChatMessage chatMessage) {
+    public ChatMessage sendMessage(@Payload ChatMessage chatMessage, SimpMessageHeaderAccessor headerAccessor) {
+        String email = (String) Objects.requireNonNull(headerAccessor.getSessionAttributes()).get("email");
         if (chatMessage.getType() == ChatMessage.MessageType.CHAT) {
             String aiAnswer = chatGptService.askChatGpt(chatMessage.getContent());
             ChatMessage aiMessage = new ChatMessage();
             aiMessage.setType(ChatMessage.MessageType.CHAT);
             aiMessage.setSender("AI");
             aiMessage.setContent(aiAnswer);
+            chatMessage.setSender(email);
             return aiMessage;
         }
-
+        chatMessage.setSender(email);
         return chatMessage;
     }
 
     @MessageMapping("/chat.addUser")
     @SendTo("/topic/public")
     public ChatMessage addUser(@Payload ChatMessage chatMessage, SimpMessageHeaderAccessor headerAccessor) {
-        Objects.requireNonNull(headerAccessor.getSessionAttributes()).put("username", chatMessage.getSender());
+        String email = (String) Objects.requireNonNull(headerAccessor.getSessionAttributes()).get("email");
+        headerAccessor.getSessionAttributes().put("username", email);
+        chatMessage.setSender(email);
         return chatMessage;
     }
 } 
