@@ -40,6 +40,7 @@ out/
 application-local.properties
 application-dev.properties
 application-prod.properties
+application.properties
 
 wal/
 loki/

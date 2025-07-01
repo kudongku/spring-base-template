@@ -8,13 +8,9 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 public class ChatMessage {
+    public enum MessageType { CHAT, JOIN, LEAVE }
     private MessageType type;
     private String content;
-    private String sender;
-
-    public enum MessageType {
-        CHAT,
-        JOIN,
-        LEAVE
-    }
+    private String sender; // JWT에서 추출
+    private String roomId; // 1:1 채팅방 ID (유저간: userA_userB, AI: gpt_userA)
 } 
