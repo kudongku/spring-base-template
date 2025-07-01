@@ -33,7 +33,8 @@ public class LoggingAspect {
     private final MailService mailService;
     private final ProfileCheckService profileCheckService;
 
-    @Around("execution(* kr.soulware.teen_mydata.controller.*.*(..))")
+    @Around("execution(* kr.soulware.teen_mydata.controller.*.*(..))" +
+        " && !within(kr.soulware.teen_mydata.controller.WebSocketController)")
     public Object logApi(ProceedingJoinPoint joinPoint) throws Throwable {
         long startTime = System.currentTimeMillis();
         LoggingData loggingData = LoggingData.builder().build();
