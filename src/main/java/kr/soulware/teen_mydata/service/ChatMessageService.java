@@ -1,7 +1,6 @@
 package kr.soulware.teen_mydata.service;
 
-import kr.soulware.teen_mydata.dto.request.ChatMessage;
-import kr.soulware.teen_mydata.entity.ChatMessageEntity;
+import kr.soulware.teen_mydata.entity.ChatMessage;
 import kr.soulware.teen_mydata.repository.ChatMessageRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -15,8 +14,8 @@ public class ChatMessageService {
 
     private final ChatMessageRepository chatMessageRepository;
 
-    public void saveMessage(ChatMessage chatMessage) {
-        ChatMessageEntity entity = new ChatMessageEntity();
+    public void saveMessage(kr.soulware.teen_mydata.dto.request.ChatMessage chatMessage) {
+        ChatMessage entity = new ChatMessage();
         entity.setRoomId(chatMessage.getRoomId());
         entity.setSender(chatMessage.getSender());
         entity.setContent(chatMessage.getContent());
@@ -25,15 +24,15 @@ public class ChatMessageService {
         chatMessageRepository.save(entity);
     }
 
-    public List<ChatMessage> getMessages(String roomId) {
+    public List<kr.soulware.teen_mydata.dto.request.ChatMessage> getMessages(String roomId) {
         return chatMessageRepository.findByRoomIdOrderByTimestampAsc(roomId)
             .stream()
             .map(entity -> {
-                ChatMessage msg = new ChatMessage();
+                kr.soulware.teen_mydata.dto.request.ChatMessage msg = new kr.soulware.teen_mydata.dto.request.ChatMessage();
                 msg.setRoomId(entity.getRoomId());
                 msg.setSender(entity.getSender());
                 msg.setContent(entity.getContent());
-                msg.setType(ChatMessage.MessageType.valueOf(entity.getType()));
+                msg.setType(kr.soulware.teen_mydata.dto.request.ChatMessage.MessageType.valueOf(entity.getType()));
                 return msg;
             })
             .collect(Collectors.toList());

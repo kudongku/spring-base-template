@@ -21,4 +21,5 @@ public class ChatHistoryController {
     public List<ChatMessage> getChatHistory(@PathVariable String roomId) {
         return chatMessageService.getMessages(roomId);
     }
-} 
+
+}

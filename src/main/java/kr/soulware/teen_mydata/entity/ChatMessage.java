@@ -10,7 +10,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @Table(name = "chat_message")
-public class ChatMessageEntity {
+public class ChatMessage {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -29,4 +29,5 @@ public class ChatMessageEntity {
 
     @Column(nullable = false)
     private Long timestamp; // System.currentTimeMillis() 등
-} 
+
+}
