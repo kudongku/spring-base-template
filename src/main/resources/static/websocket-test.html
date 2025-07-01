@@ -39,7 +39,6 @@
     <h2>웹소켓 채팅 테스트</h2>
     <input id="jwt" placeholder="JWT 토큰 입력" />
     <br />
-    <input id="username" placeholder="닉네임 입력" />
     <button onclick="connect()">연결</button>
     <br /><br />
     <input id="message" placeholder="메시지 입력" />
@@ -49,16 +48,12 @@
       let stompClient = null;
 
       function connect() {
-        const username = document.getElementById("username").value;
         const jwt = document.getElementById("jwt").value;
-        if (!username) {
-          alert("닉네임을 입력하세요.");
-          return;
-        }
         if (!jwt) {
           alert("JWT 토큰을 입력하세요.");
           return;
         }
+        // JWT를 쿼리 파라미터로 전달
         const socket = new SockJS("/ws?token=" + encodeURIComponent(jwt));
         stompClient = Stomp.over(socket);
         stompClient.connect({}, function () {
@@ -73,7 +68,6 @@
             "/app/chat.addUser",
             {},
             JSON.stringify({
-              sender: username,
               type: "JOIN",
             })
           );
@@ -82,7 +76,6 @@
 
       function sendMessage() {
         const content = document.getElementById("message").value;
-        const sender = document.getElementById("username").value;
         if (!stompClient || !stompClient.connected) {
           alert("먼저 연결하세요.");
           return;
@@ -95,7 +88,6 @@
           "/app/chat.sendMessage",
           {},
           JSON.stringify({
-            sender: sender,
             content: content,
             type: "CHAT",
           })
