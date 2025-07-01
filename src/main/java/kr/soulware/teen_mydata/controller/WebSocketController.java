@@ -3,7 +3,6 @@ package kr.soulware.teen_mydata.controller;
 import kr.soulware.teen_mydata.dto.request.ChatMessage;
 import kr.soulware.teen_mydata.service.ChatGptService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.handler.annotation.SendTo;
@@ -16,7 +15,7 @@ import java.util.Objects;
 @Controller
 public class WebSocketController {
 
-    private ChatGptService chatGptService;
+    private final ChatGptService chatGptService;
 
     @MessageMapping("/chat.sendMessage")
     @SendTo("/topic/public")
