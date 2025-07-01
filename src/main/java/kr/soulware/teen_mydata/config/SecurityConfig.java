@@ -3,7 +3,6 @@ package kr.soulware.teen_mydata.config;
 import kr.soulware.teen_mydata.filter.JwtAuthenticationFilter;
 import kr.soulware.teen_mydata.handler.OAuth2AuthenticationSuccessHandler;
 import kr.soulware.teen_mydata.service.CustomOAuth2UserService;
-import kr.soulware.teen_mydata.service.JwtService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -30,7 +29,8 @@ public class SecurityConfig {
         "/swagger-resources/**", // Swagger 리소스
         "/webjars/**",           // 웹자바 리소스
         "/configuration/ui",     // Swagger UI 설정
-        "/configuration/security"// Swagger 보안 설정
+        "/configuration/security",// Swagger 보안 설정
+        "/ws/**"                 // SockJS/WebSocket 폴백 경로 허용 (중요)
     };
 
     private final CustomOAuth2UserService customOAuth2UserService;
